@@ -507,7 +507,7 @@ textarea { resize: vertical; }
       <button class="nav-btn" onclick="showPage('allstar',this)">All-Star</button>
       <button class="nav-btn" onclick="showPage('bids',this)">📋 Submit Bid</button>
       <button class="nav-btn" onclick="showPage('admin',this)">🔒 Mod</button>
-      <button class="nav-btn" onclick="showPage('howto',this)">📖 How to Update</button>
+
     </nav>
   </div>
 </header>
@@ -1322,137 +1322,97 @@ textarea { resize: vertical; }
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-title">Quick <span class="accent">Edit Guide</span></div>
-      <div class="card">
-        <div style="font-size:14px;color:var(--text-muted);line-height:1.8">
-          To update standings, stats, rosters, or any data on this site:<br>
-          1. Open the <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:12px">bhl_s28.html</code> file in a text editor (Notepad, VS Code, etc.)<br>
-          2. Use Ctrl+F to search for the data you want to change (e.g. a player name or "0" in a standings row)<br>
-          3. Edit the value directly in the HTML<br>
-          4. Save the file and re-upload it to GitHub Pages<br><br>
-          Or simply upload your updated spreadsheet to Claude and ask for a rebuild!
+    <!-- ===== LIVE EDITOR ===== -->
+    <div class="section" style="margin-top:8px">
+      <div class="section-title">✏️ Live <span class="accent">Editor</span></div>
+      <div class="warn-box" style="font-size:13px">Changes apply immediately on this page. They are <strong>session-only</strong> — refresh the page and values reset. To save permanently, use the "Export HTML" button below.</div>
+
+      <!-- Editor tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="nav-btn active" id="etab-home" onclick="switchEditTab('home',this)" style="font-size:12px;padding:6px 12px">🏠 Home Info</button>
+        <button class="nav-btn" id="etab-standings" onclick="switchEditTab('standings',this)" style="font-size:12px;padding:6px 12px">📊 Standings</button>
+        <button class="nav-btn" id="etab-skaters" onclick="switchEditTab('skaters',this)" style="font-size:12px;padding:6px 12px">🏒 Skater Stats</button>
+        <button class="nav-btn" id="etab-goalies" onclick="switchEditTab('goalies',this)" style="font-size:12px;padding:6px 12px">🥅 Goalie Stats</button>
+        <button class="nav-btn" id="etab-passcodes" onclick="switchEditTab('passcodes',this)" style="font-size:12px;padding:6px 12px">🔑 Passcodes</button>
+      </div>
+
+      <!-- HOME INFO editor -->
+      <div id="editpanel-home">
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Hero Banner</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Season Number</label><input id="ed-season" type="text" value="28" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>Commissioner</label><input id="ed-commissioner" type="text" value="Youppi" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>Season Start Date</label><input id="ed-startdate" type="text" value="May 12, 2026" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>FA Status Badge</label><input id="ed-fastatus" type="text" value="Free Agency Phase 1 Open" oninput="applyHomeEdits()"></div>
+          </div>
         </div>
+        <div class="card">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Stat Cards</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Registered Players</label><input id="ed-players" type="number" value="124" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>Superstars</label><input id="ed-superstars" type="number" value="15" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>Pros</label><input id="ed-pros" type="number" value="29" oninput="applyHomeEdits()"></div>
+            <div class="form-group"><label>Amateurs</label><input id="ed-amateurs" type="number" value="80" oninput="applyHomeEdits()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STANDINGS editor -->
+      <div id="editpanel-standings" style="display:none">
+        <div class="info-box" style="font-size:13px">Edit each team's record below. PTS is auto-calculated (W×2 + OTL×1).</div>
+        <div class="table-wrap">
+          <table id="ed-standings-table">
+            <thead><tr><th>Team</th><th>GP</th><th>W</th><th>L</th><th>OTL</th><th>GF</th><th>GA</th></tr></thead>
+            <tbody id="ed-standings-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="applyStandingsEdits()">Apply Standings</button>
+      </div>
+
+      <!-- SKATER STATS editor -->
+      <div id="editpanel-skaters" style="display:none">
+        <div class="table-wrap">
+          <table id="ed-skaters-table">
+            <thead><tr><th>Player</th><th>Team</th><th>GP</th><th>G</th><th>A</th><th>PTS</th><th>TOU</th><th>BLK</th><th>SOG</th><th>+/-</th><th>PIM</th></tr></thead>
+            <tbody id="ed-skaters-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="applySkaterEdits()">Apply Skater Stats</button>
+      </div>
+
+      <!-- GOALIE STATS editor -->
+      <div id="editpanel-goalies" style="display:none">
+        <div class="table-wrap">
+          <table id="ed-goalies-table">
+            <thead><tr><th>Player</th><th>Team</th><th>GP</th><th>W</th><th>SO</th><th>SF</th><th>SV</th><th>GA</th><th>SV%</th><th>GAA</th></tr></thead>
+            <tbody id="ed-goalies-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="applyGoalieEdits()">Apply Goalie Stats</button>
+      </div>
+
+      <!-- PASSCODES editor -->
+      <div id="editpanel-passcodes" style="display:none">
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Team Passcodes</div>
+          <div id="ed-passcodes-list"></div>
+        </div>
+        <div class="card">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Moderator Passcode</div>
+          <div class="form-group"><label>Mod passcode</label><input id="ed-modpass" type="text" value="MOD-YOUPPI28"></div>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="applyPasscodeEdits()">Apply Passcodes</button>
+      </div>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <button class="btn" onclick="exportHTML()" style="background:var(--teal);color:var(--navy)">⬇ Export Updated HTML</button>
+        <span style="font-size:12px;color:var(--text-muted);margin-left:12px">Downloads the full page with all your current edits baked in.</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===================== HOW TO UPDATE ===================== -->
-<div id="page-howto" class="page">
-  <div class="page-title">How to Update</div>
-  <div class="page-subtitle">Step-by-step guide to hosting and updating this website</div>
-
-  <div class="section">
-    <div class="section-title">🚀 Step 1: <span class="accent">Host on GitHub Pages (Free)</span></div>
-    <div class="card">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Create a free GitHub account</h4>
-          <p>Go to <strong style="color:var(--gold2)">github.com</strong> and sign up for a free account if you don't have one already.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Create a new repository</h4>
-          <p>Click the green "New" button. Name it something like <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">bhl-season28</code>. Make sure it is set to <strong style="color:var(--gold2)">Public</strong>. Check "Add a README file". Click "Create repository".</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Upload the HTML file</h4>
-          <p>Click "Add file" → "Upload files". Drag and drop the <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">bhl_s28.html</code> file you downloaded from Claude. Then rename it to <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">index.html</code> (GitHub Pages requires this name). Click "Commit changes".</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h4>Enable GitHub Pages</h4>
-          <p>Go to your repository's <strong style="color:var(--gold2)">Settings</strong> → scroll down to <strong style="color:var(--gold2)">Pages</strong> → under "Source" select <strong style="color:var(--gold2)">Deploy from a branch</strong> → choose <strong style="color:var(--gold2)">main</strong> branch → click Save.</p>
-          <div class="code-block">Your site will be live at: https://YOUR-USERNAME.github.io/bhl-season28/</div>
-        </div>
-      </div>
-      <div class="step" style="margin-bottom:0">
-        <div class="step-num">5</div>
-        <div class="step-content">
-          <h4>Share the link!</h4>
-          <p>GitHub Pages usually goes live within 1–2 minutes. Share your URL with the league. It's free, permanent, and accessible from any device.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">✏️ Step 2: <span class="accent">Updating the Site</span></div>
-    <div class="card">
-      <div class="step">
-        <div class="step-num">A</div>
-        <div class="step-content">
-          <h4>Option A — Let Claude rebuild it (easiest)</h4>
-          <p>Come back to Claude at any time, upload your updated spreadsheet file, and say "Rebuild the BHL website with these new stats." Claude will generate a fresh HTML file with all the new data. Then just re-upload it to GitHub as shown in Step 3 above.</p>
-        </div>
-      </div>
-      <div class="step" style="margin-bottom:0">
-        <div class="step-num">B</div>
-        <div class="step-content">
-          <h4>Option B — Edit the HTML directly (fastest for small changes)</h4>
-          <p>Download <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">index.html</code> from GitHub. Open it in any text editor (Notepad, VS Code, TextEdit). Use Ctrl+F (Find) to locate the data you want to change — search for a player name, a "0" in a stats row, or any text on the page. Edit the value, save, and re-upload to GitHub.</p>
-          <div class="code-block">Example: To update Youppi's goals from 0 to 3, search for "Youppi" and change the &lt;td class="td-num"&gt;0&lt;/td&gt; after G to &lt;td class="td-num"&gt;3&lt;/td&gt;</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">🔄 Step 3: <span class="accent">Re-uploading to GitHub</span></div>
-    <div class="card">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Go to your repository</h4>
-          <p>Log into GitHub and open your <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">bhl-season28</code> repository.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Click on index.html</h4>
-          <p>Click the <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">index.html</code> file in the file list.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Click the pencil icon (Edit) or upload new version</h4>
-          <p>Either click the pencil ✏️ icon to edit directly in the browser, OR click the three-dot menu → "Delete file", then re-upload the new version via "Add file" → "Upload files".</p>
-        </div>
-      </div>
-      <div class="step" style="margin-bottom:0">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h4>Commit changes</h4>
-          <p>Click "Commit changes". GitHub Pages will automatically update your live site within about 60 seconds.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">💡 <span class="accent">Tips</span></div>
-    <div class="card">
-      <div style="font-size:14px;color:var(--text-muted);line-height:2">
-        • <strong style="color:var(--text-light)">Passcodes</strong> — Share each team's passcode privately with their GM. Change them anytime by editing the <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">TEAM_PASSCODES</code> object in the HTML's &lt;script&gt; section.<br>
-        • <strong style="color:var(--text-light)">Moderator passcode</strong> — Currently <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">MOD-YOUPPI28</code>. Change it in the <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">MOD_PASS</code> variable.<br>
-        • <strong style="color:var(--text-light)">Stats updates</strong> — After each game night, come to Claude with updated scores and it can refresh the whole file.<br>
-        • <strong style="color:var(--text-light)">Bids are session-only</strong> — The bid submission system stores data in the browser session only. Any submitted bids are cleared when the page reloads. For a permanent bid log, use Claude to add new bids directly to the approved offers table in the HTML.<br>
-        • <strong style="color:var(--text-light)">Custom domain</strong> — GitHub Pages supports custom domains (e.g. bhl-s28.com) for free if you own one.
-      </div>
-    </div>
-  </div>
-</div>
 
 </main>
 
@@ -1463,7 +1423,7 @@ const TEAM_PASSCODES = {
   'New York Phantoms':'NYC-2267','Orlando Storm':'ORL-6634','Philadelphia Freedom':'PHI-9921',
   'San Francisco Stingrays':'SFS-4478','Seattle Golden Eagles':'SEA-3315','Toronto Rockets':'TOR-7791'
 };
-const MOD_PASS = 'MOD-YOUPPI28';
+let MOD_PASS = 'MOD-YOUPPI28';
 let pendingBids = [];
 
 function showPage(id, btn) {
@@ -1572,6 +1532,344 @@ function adminLogout() {
   document.getElementById('admin-login-wrap').style.display = 'block';
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('admin-pass').value = '';
+}
+
+/* ============================================================
+   LIVE EDITOR
+   ============================================================ */
+
+function switchEditTab(tab, btn) {
+  ['home','standings','skaters','goalies','passcodes'].forEach(t => {
+    document.getElementById('editpanel-' + t).style.display = 'none';
+    document.getElementById('etab-' + t).classList.remove('active');
+  });
+  document.getElementById('editpanel-' + tab).style.display = '';
+  btn.classList.add('active');
+  if (tab === 'standings') initStandingsEditor();
+  if (tab === 'skaters') initSkatersEditor();
+  if (tab === 'goalies') initGoaliesEditor();
+  if (tab === 'passcodes') initPasscodesEditor();
+}
+
+/* ---- HOME INFO ---- */
+function applyHomeEdits() {
+  const season = document.getElementById('ed-season').value;
+  const comm   = document.getElementById('ed-commissioner').value;
+  const start  = document.getElementById('ed-startdate').value;
+  const fas    = document.getElementById('ed-fastatus').value;
+  const plrs   = document.getElementById('ed-players').value;
+  const ss     = document.getElementById('ed-superstars').value;
+  const pros   = document.getElementById('ed-pros').value;
+  const ams    = document.getElementById('ed-amateurs').value;
+
+  // Hero heading
+  const h1 = document.querySelector('#page-home .hero h1');
+  if (h1) h1.innerHTML = 'BHL <span>Season</span> ' + season;
+
+  // Hero sub line
+  const sub = document.querySelector('#page-home .hero-sub');
+  if (sub) sub.textContent = 'Commissioner: ' + comm + '  ·  12 Teams  ·  2 Divisions  ·  26 Games Per Team';
+
+  // Badges
+  const badges = document.querySelectorAll('#page-home .hbadge');
+  if (badges[0]) badges[0].textContent = '🏒 Season ' + season;
+  if (badges[1]) badges[1].textContent = '📅 Starts ' + start;
+  if (badges[2]) badges[2].textContent = '🟢 ' + fas;
+  if (badges[3]) badges[3].textContent = '📋 ' + plrs + ' Registered Players';
+
+  // Stat cards
+  const statVals = document.querySelectorAll('#page-home .stat-grid .stat-val');
+  // order: Teams(0), Players(1), SS(2), Pros(3), Ams(4), Games/Team(5)
+  if (statVals[1]) statVals[1].textContent = plrs;
+  if (statVals[2]) statVals[2].textContent = ss;
+  if (statVals[3]) statVals[3].textContent = pros;
+  if (statVals[4]) statVals[4].textContent = ams;
+
+  // Page title
+  document.title = 'BHL Season ' + season;
+  const logo = document.querySelector('.logo');
+  if (logo) logo.innerHTML = 'BHL <span>S' + season + '</span>';
+
+  // hero watermark text
+  const heroEl = document.querySelector('.hero');
+  if (heroEl) {
+    const style = heroEl.style;
+    // update ::before content via a dynamic style tag
+    let dynStyle = document.getElementById('dyn-hero-style');
+    if (!dynStyle) { dynStyle = document.createElement('style'); dynStyle.id = 'dyn-hero-style'; document.head.appendChild(dynStyle); }
+    dynStyle.textContent = '.hero::before { content: "S' + season + '" !important; }';
+  }
+}
+
+/* ---- STANDINGS ---- */
+const TEAMS = [
+  {name:'Seattle Golden Eagles', div:'north'},
+  {name:'Calgary Wings', div:'north'},
+  {name:'Boston Grizzlies', div:'north'},
+  {name:'Minnesota Gray Ducks', div:'north'},
+  {name:'Toronto Rockets', div:'north'},
+  {name:'Montreal Voyageurs', div:'north'},
+  {name:'New York Phantoms', div:'south'},
+  {name:'Orlando Storm', div:'south'},
+  {name:'Carolina Cobras', div:'south'},
+  {name:'San Francisco Stingrays', div:'south'},
+  {name:'Philadelphia Freedom', div:'south'},
+  {name:'Milwaukee Muskies', div:'south'}
+];
+
+function initStandingsEditor() {
+  const tbody = document.getElementById('ed-standings-tbody');
+  if (tbody.children.length) return; // already built
+  const srcRows = document.querySelectorAll('#standings-body tr');
+  TEAMS.forEach((team, i) => {
+    const src = srcRows[i];
+    const cells = src ? src.querySelectorAll('td') : [];
+    const gp  = cells[3] ? cells[3].textContent : '0';
+    const w   = cells[4] ? cells[4].textContent : '0';
+    const l   = cells[5] ? cells[5].textContent : '0';
+    const otl = cells[6] ? cells[6].textContent : '0';
+    const gf  = cells[8] ? cells[8].textContent : '0';
+    const ga  = cells[9] ? cells[9].textContent : '0';
+    const iw = n => `<input type="number" min="0" value="${n}" style="width:54px;padding:4px 6px;font-size:13px;text-align:center" data-team="${i}" data-field="${i}_${gp}">`;
+    const row = document.createElement('tr');
+    row.innerHTML = `<td class="td-player" style="white-space:nowrap">${team.name}</td>
+      <td><input type="number" min="0" value="${gp}" style="width:48px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_gp"></td>
+      <td><input type="number" min="0" value="${w}"  style="width:48px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_w"></td>
+      <td><input type="number" min="0" value="${l}"  style="width:48px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_l"></td>
+      <td><input type="number" min="0" value="${otl}"style="width:48px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_otl"></td>
+      <td><input type="number" min="0" value="${gf}" style="width:54px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_gf"></td>
+      <td><input type="number" min="0" value="${ga}" style="width:54px;padding:4px 6px;font-size:13px;text-align:center" id="s${i}_ga"></td>`;
+    tbody.appendChild(row);
+  });
+}
+
+function applyStandingsEdits() {
+  const rows = [];
+  TEAMS.forEach((team, i) => {
+    const gp  = parseInt(document.getElementById('s'+i+'_gp').value)||0;
+    const w   = parseInt(document.getElementById('s'+i+'_w').value)||0;
+    const l   = parseInt(document.getElementById('s'+i+'_l').value)||0;
+    const otl = parseInt(document.getElementById('s'+i+'_otl').value)||0;
+    const gf  = parseInt(document.getElementById('s'+i+'_gf').value)||0;
+    const ga  = parseInt(document.getElementById('s'+i+'_ga').value)||0;
+    const pts = w*2 + otl;
+    const gd  = gf - ga;
+    rows.push({team, gp, w, l, otl, pts, gf, ga, gd});
+  });
+
+  // Sort by PTS desc, then GD desc
+  rows.sort((a,b) => b.pts - a.pts || b.gd - a.gd);
+
+  const tbody = document.getElementById('standings-body');
+  tbody.innerHTML = '';
+  rows.forEach((r,idx) => {
+    const divBadge = r.team.div === 'north'
+      ? '<span class="badge badge-north">North</span>'
+      : '<span class="badge badge-south">South</span>';
+    tbody.innerHTML += `<tr>
+      <td>${idx+1}</td>
+      <td class="td-player">${r.team.name}</td>
+      <td>${divBadge}</td>
+      <td class="td-num">${r.gp}</td>
+      <td class="td-num">${r.w}</td>
+      <td class="td-num">${r.l}</td>
+      <td class="td-num">${r.otl}</td>
+      <td class="td-num">${r.pts}</td>
+      <td class="td-num">${r.gf}</td>
+      <td class="td-num">${r.ga}</td>
+      <td class="td-num">${r.gd >= 0 ? '+'+r.gd : r.gd}</td>
+    </tr>`;
+  });
+
+  // Also update the team stats page
+  applyTeamStats(rows);
+  alert('Standings updated! ✓');
+}
+
+function applyTeamStats(rows) {
+  // find team stats tbody — it doesn't have an id so target by page
+  const statTbody = document.querySelector('#page-stats table:last-of-type tbody');
+  if (!statTbody) return;
+  statTbody.innerHTML = '';
+  rows.forEach((r,idx) => {
+    const pct = r.gp > 0 ? ((r.pts / (r.gp*2))*100).toFixed(1)+'%' : '0.0%';
+    statTbody.innerHTML += `<tr>
+      <td>${idx+1}</td>
+      <td class="td-player">${r.team.name}</td>
+      <td class="td-num">${r.gp}</td>
+      <td class="td-num">${r.w}</td>
+      <td class="td-num">${r.l}</td>
+      <td class="td-num">${r.otl}</td>
+      <td class="td-num">${r.pts}</td>
+      <td class="td-num">${r.gf}</td>
+      <td class="td-num">${r.ga}</td>
+      <td class="td-num">${r.gf-r.ga >= 0 ? '+'+(r.gf-r.ga) : r.gf-r.ga}</td>
+      <td class="td-num">—</td>
+      <td class="td-num">—</td>
+      <td class="td-num">${pct}</td>
+    </tr>`;
+  });
+}
+
+/* ---- SKATER STATS ---- */
+function initSkatersEditor() {
+  const tbody = document.getElementById('ed-skaters-tbody');
+  if (tbody.children.length) return;
+  const srcRows = document.querySelectorAll('#page-stats table:first-of-type tbody tr');
+  srcRows.forEach((row, i) => {
+    const cells = row.querySelectorAll('td');
+    const player = cells[1] ? cells[1].textContent : '';
+    const team   = cells[2] ? cells[2].textContent : '';
+    const vals   = [3,4,5,6,7,8,9,10,11].map(c => cells[c] ? cells[c].textContent : '0');
+    const fields = ['gp','g','a','pts','tou','blk','sog','pm','pim'];
+    const inpStyle = 'style="width:44px;padding:4px 6px;font-size:13px;text-align:center"';
+    const inps = fields.map((f,fi) =>
+      `<td><input type="number" id="sk${i}_${f}" value="${vals[fi]}" ${inpStyle}></td>`
+    ).join('');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="td-player" style="white-space:nowrap">${player}</td><td class="td-team">${team}</td>${inps}`;
+    tbody.appendChild(tr);
+  });
+}
+
+function applySkaterEdits() {
+  const srcRows = document.querySelectorAll('#page-stats table:first-of-type tbody tr');
+  const fields = ['gp','g','a','pts','tou','blk','sog','pm','pim'];
+  srcRows.forEach((row, i) => {
+    const cells = row.querySelectorAll('td');
+    fields.forEach((f, fi) => {
+      const inp = document.getElementById('sk'+i+'_'+f);
+      if (inp && cells[fi+3]) cells[fi+3].textContent = inp.value;
+    });
+  });
+  // Re-sort by PTS
+  const tbody = document.querySelector('#page-stats table:first-of-type tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a,b) => {
+    const pa = parseInt(a.querySelectorAll('td')[6].textContent)||0;
+    const pb = parseInt(b.querySelectorAll('td')[6].textContent)||0;
+    return pb - pa;
+  });
+  rows.forEach((r,idx) => { r.querySelector('td').textContent = idx+1; tbody.appendChild(r); });
+  alert('Skater stats updated! ✓');
+}
+
+/* ---- GOALIE STATS ---- */
+function initGoaliesEditor() {
+  const tbody = document.getElementById('ed-goalies-tbody');
+  if (tbody.children.length) return;
+  const srcRows = document.querySelectorAll('#page-stats table:nth-of-type(2) tbody tr');
+  srcRows.forEach((row, i) => {
+    const cells = row.querySelectorAll('td');
+    const player = cells[1] ? cells[1].textContent : '';
+    const team   = cells[2] ? cells[2].textContent : '';
+    const gp = cells[3]?cells[3].textContent:'0';
+    const w  = cells[4]?cells[4].textContent:'0';
+    const so = cells[5]?cells[5].textContent:'0';
+    const sf = cells[6]?cells[6].textContent:'0';
+    const sv = cells[7]?cells[7].textContent:'0';
+    const ga = cells[8]?cells[8].textContent:'0';
+    const inpStyle = 'style="width:50px;padding:4px 6px;font-size:13px;text-align:center"';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="td-player" style="white-space:nowrap">${player}</td><td class="td-team">${team}</td>
+      <td><input type="number" id="gl${i}_gp" value="${gp}" ${inpStyle}></td>
+      <td><input type="number" id="gl${i}_w"  value="${w}"  ${inpStyle}></td>
+      <td><input type="number" id="gl${i}_so" value="${so}" ${inpStyle}></td>
+      <td><input type="number" id="gl${i}_sf" value="${sf}" ${inpStyle}></td>
+      <td><input type="number" id="gl${i}_sv" value="${sv}" ${inpStyle}></td>
+      <td><input type="number" id="gl${i}_ga" value="${ga}" ${inpStyle}></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function applyGoalieEdits() {
+  const srcRows = document.querySelectorAll('#page-stats table:nth-of-type(2) tbody tr');
+  srcRows.forEach((row, i) => {
+    const cells = row.querySelectorAll('td');
+    const gp = parseInt(document.getElementById('gl'+i+'_gp').value)||0;
+    const w  = parseInt(document.getElementById('gl'+i+'_w').value)||0;
+    const so = parseInt(document.getElementById('gl'+i+'_so').value)||0;
+    const sf = parseInt(document.getElementById('gl'+i+'_sf').value)||0;
+    const sv = parseInt(document.getElementById('gl'+i+'_sv').value)||0;
+    const ga = parseInt(document.getElementById('gl'+i+'_ga').value)||0;
+    const svpct = sf > 0 ? (sv/sf*100).toFixed(1)+'%' : '—';
+    const gaa   = gp > 0 ? (ga/gp).toFixed(2) : '—';
+    if(cells[3]) cells[3].textContent = gp;
+    if(cells[4]) cells[4].textContent = w;
+    if(cells[5]) cells[5].textContent = so;
+    if(cells[6]) cells[6].textContent = sf;
+    if(cells[7]) cells[7].textContent = sv;
+    if(cells[8]) cells[8].textContent = ga;
+    if(cells[9]) cells[9].textContent = svpct;
+    if(cells[10]) cells[10].textContent = gaa;
+  });
+  alert('Goalie stats updated! ✓');
+}
+
+/* ---- PASSCODES ---- */
+function initPasscodesEditor() {
+  const list = document.getElementById('ed-passcodes-list');
+  if (list.children.length) return;
+  const grid = document.createElement('div');
+  grid.className = 'form-grid';
+  Object.entries(TEAM_PASSCODES).forEach(([team, code]) => {
+    const div = document.createElement('div');
+    div.className = 'form-group';
+    const safeId = 'pc_' + team.replace(/\s+/g,'_');
+    div.innerHTML = `<label>${team}</label><input type="text" id="${safeId}" value="${code}">`;
+    grid.appendChild(div);
+  });
+  list.appendChild(grid);
+}
+
+function applyPasscodeEdits() {
+  Object.keys(TEAM_PASSCODES).forEach(team => {
+    const safeId = 'pc_' + team.replace(/\s+/g,'_');
+    const inp = document.getElementById(safeId);
+    if (inp) TEAM_PASSCODES[team] = inp.value.trim();
+  });
+  const modInp = document.getElementById('ed-modpass');
+  if (modInp) MOD_PASS = modInp.value.trim();
+
+  // Update the visible passcode table
+  const pcRows = document.querySelectorAll('.passcode-table tbody tr');
+  let i = 0;
+  Object.entries(TEAM_PASSCODES).forEach(([team, code]) => {
+    if (pcRows[i]) pcRows[i].querySelector('.passcode-val').textContent = code;
+    i++;
+  });
+  if (pcRows[i]) pcRows[i].querySelector('.passcode-val').textContent = MOD_PASS;
+  alert('Passcodes updated! ✓');
+}
+
+/* ---- EXPORT HTML ---- */
+function exportHTML() {
+  const clone = document.documentElement.cloneNode(true);
+  // Remove admin panel content for security - keep it but clear the pass input
+  const passInput = clone.querySelector('#admin-pass');
+  if (passInput) passInput.value = '';
+  const adminPanel = clone.querySelector('#admin-panel');
+  if (adminPanel) adminPanel.style.display = 'none';
+  const loginWrap = clone.querySelector('#admin-login-wrap');
+  if (loginWrap) loginWrap.style.display = '';
+
+  // Update the TEAM_PASSCODES and MOD_PASS in the script
+  const scripts = clone.querySelectorAll('script');
+  scripts.forEach(s => {
+    if (s.textContent.includes('TEAM_PASSCODES')) {
+      let txt = s.textContent;
+      const newPcObj = JSON.stringify(TEAM_PASSCODES).replace(/"/g, "'").slice(1,-1).replace(/,/g,',\n  ');
+      txt = txt.replace(/const TEAM_PASSCODES = \{[\s\S]*?\};/, `const TEAM_PASSCODES = {\n  ${newPcObj}\n};`);
+      txt = txt.replace(/const MOD_PASS = '[^']*';/, `const MOD_PASS = '${MOD_PASS}';`);
+      s.textContent = txt;
+    }
+  });
+
+  const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'bhl_s28_updated.html';
+  a.click();
 }
 </script>
 </body>
